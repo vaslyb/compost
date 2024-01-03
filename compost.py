@@ -1,4 +1,3 @@
-import numpy as np
 import json
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
@@ -7,27 +6,27 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.svm import LinearSVR
+from sklearn.preprocessing import StandardScaler
 import pandas as pd
 
 # Load CSV file using Pandas
-df = pd.read_csv('compost.csv')
+df = pd.read_csv('compost.csv', skiprows=1) 
 
-gi
-# Load the CSV file
-data = np.loadtxt('compost.csv', delimiter=',', skiprows=1)  
-header = np.loadtxt('compost.csv', delimiter=',', max_rows=1)
+df = df.replace(',', '.', regex=True)  # Replace commas with dots (assuming ',' represents decimal separator)
 
-# Keep labels
-target_column_index = -1
+# Extract features and target from the DataFrame
+features = df.iloc[:, 1:5].values  
+target = df.iloc[:, -4:].values  
 
-# Extract features 
-features = data[:, :target_column_index]
+# Standardize the features
+scaler = StandardScaler()
+features_standardized = scaler.fit_transform(features)
 
-# Extract the target column
-target = data[:, target_column_index]
+target = target.astype(float)
+target_standardized = scaler.fit_transform(target)
 
 # Split the data into training and testing sets
-x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=0.33, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(features_standardized, target_standardized, test_size=0.15, random_state=42)
 
 # Define a list of regression models
 models = [
@@ -69,6 +68,6 @@ for model_name, result in results.items():
 
 # Save results to a JSON file
 with open('compost_results.json', 'w') as json_file:
-    json.dump(results, json_file, indent=4)
+    json.dump(results, json_file, indent=4, default=lambda x: x.tolist())
 
 print("Results saved to 'compost_results.json'")
