@@ -1,6 +1,6 @@
 import json
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
@@ -49,23 +49,28 @@ for model in models:
     
     # Make predictions on the training set
     train_predictions = model.predict(x_train)
-    train_score = mean_squared_error(y_train, train_predictions)
+    train_mse = mean_squared_error(y_train, train_predictions)
+    train_mae = mean_absolute_error(y_train, train_predictions)
     
     # Make predictions on the test set
     test_predictions = model.predict(x_test)
-    test_score = mean_squared_error(y_test, test_predictions)
+    test_mse = mean_squared_error(y_test, test_predictions)
+    test_mae = mean_absolute_error(y_test, test_predictions)
     
     # Store results in the dictionary
     results[model_name] = {
-        'train_score': train_score,
-        'test_score': test_score,
+        'train_mse': train_mse,
+        'test_mse': test_mse,
+        'train_mae': train_mae,
+        'test_mae': test_mae,
         'coefficients': list(model.coef_) if hasattr(model, 'coef_') else None
     }
 
 # Print and save results to a JSON file
 print("Results:")
 for model_name, result in results.items():
-    print(f"{model_name}: Train Score = {result['train_score']}, Test Score = {result['test_score']}")
+    print(f"{model_name}: Train MSE = {result['train_mse']}, Test MSE = {result['test_mse']}")
+    print(f"{model_name}: Train MAE = {result['train_mae']}, Test MAE = {result['test_mae']}")
 
 # Save results to a JSON file
 with open('compost_results.json', 'w') as json_file:

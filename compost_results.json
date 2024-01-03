@@ -1,7 +1,9 @@
 {
     "LinearRegression": {
-        "train_score": 0.48423034544446314,
-        "test_score": 0.5275147025178606,
+        "train_mse": 0.48423034544446314,
+        "test_mse": 0.5275147025178606,
+        "train_mae": 0.5666330985610888,
+        "test_mae": 0.5723065545951225,
         "coefficients": [
             [
                 0.11409514404456096,
@@ -30,18 +32,24 @@
         ]
     },
     "KNeighborsRegressor": {
-        "train_score": 0.34966052475471665,
-        "test_score": 0.38938277433466806,
+        "train_mse": 0.34966052475471665,
+        "test_mse": 0.38938277433466806,
+        "train_mae": 0.46452711984055284,
+        "test_mae": 0.4833394316261487,
         "coefficients": null
     },
     "DecisionTreeRegressor": {
-        "train_score": 0.021010530599233093,
-        "test_score": 1.1281375641055942,
+        "train_mse": 0.021010530599233093,
+        "test_mse": 1.1294055831230931,
+        "train_mae": 0.03935906539019089,
+        "test_mae": 0.7651069720555892,
         "coefficients": null
     },
     "MultiOutputRegressor": {
-        "train_score": 0.5316455636350643,
-        "test_score": 0.5059322383394925,
+        "train_mse": 0.5315605089701412,
+        "test_mse": 0.5061604743987083,
+        "train_mae": 0.5558880808539856,
+        "test_mae": 0.5828214854697621,
         "coefficients": null
     }
 }
