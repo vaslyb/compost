@@ -9,6 +9,8 @@ from sklearn.svm import LinearSVR
 from sklearn.preprocessing import StandardScaler
 import plotly.graph_objects as go
 import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
 
 # Load CSV file using Pandas
 df = pd.read_csv('compost.csv') 
@@ -16,8 +18,8 @@ df = pd.read_csv('compost.csv')
 df = df.replace(',', '.', regex=True)  # Replace commas with dots (assuming ',' represents decimal separator)
 
 # Extract features and target from the DataFrame
-features = df.iloc[:, 1:5].values  
-target = df.iloc[:, -4:].values  
+features = df.iloc[:, 1:7].values  
+target = df.iloc[:, -5:].values  
 
 # Standardize the features
 scaler = StandardScaler()
@@ -46,6 +48,16 @@ for model in models:
     
     # Train the model
     model.fit(x_train, y_train)
+    if isinstance(model, DecisionTreeRegressor):
+        # Visualize a limited-depth decision tree
+        max_depth = 3  # Set the maximum depth you want to visualize
+        plt.figure(figsize=(18, 12))
+        plot_tree(model, filled=True, feature_names=df.columns[1:7], class_names=df.columns[-5:], fontsize=10, max_depth=max_depth)
+        plt.title(f'{model_name} Decision Tree (Max Depth = {max_depth})')
+        image_file_path = f'{model_name}_decision_tree.png'
+        plt.savefig(image_file_path)
+        print(f'Decision tree visualization saved to {image_file_path}')
+
     
     # Make predictions on the training set
     train_predictions = model.predict(x_train)
@@ -84,8 +96,8 @@ for model_name, result in results.items():
     if coefficients is not None:
         fig = go.Figure(data=go.Heatmap(
             z=coefficients * 100,
-            x=df.columns[1:5],
-            y=df.columns[-4:],
+            x=df.columns[1:7],
+            y=df.columns[-5:],
             colorscale='YlOrRd',
             colorbar=dict(title='Coefficients')
         ))
