@@ -7,10 +7,11 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.svm import LinearSVR
 from sklearn.preprocessing import StandardScaler
+import plotly.graph_objects as go
 import pandas as pd
 
 # Load CSV file using Pandas
-df = pd.read_csv('compost.csv', skiprows=1) 
+df = pd.read_csv('compost.csv') 
 
 df = df.replace(',', '.', regex=True)  # Replace commas with dots (assuming ',' represents decimal separator)
 
@@ -71,3 +72,20 @@ with open('compost_results.json', 'w') as json_file:
     json.dump(results, json_file, indent=4, default=lambda x: x.tolist())
 
 print("Results saved to 'compost_results.json'")
+
+# Plot coefficients using Plotly
+for model_name, result in results.items():
+    coefficients = result['coefficients']
+    if coefficients is not None:
+        fig = go.Figure(data=go.Heatmap(
+            z=coefficients * 100,
+            x=df.columns[1:5],
+            y=df.columns[-4:],
+            colorscale='YlOrRd',
+            colorbar=dict(title='Coefficients')
+        ))
+        fig.update_layout(title=f'{model_name} Coefficients Heatmap', xaxis_title='Features', yaxis_title='Target Variables')
+
+        # Save the figure as an image file (e.g., PNG)
+        fig.write_image(f'{model_name}_heatmap.png')
+
