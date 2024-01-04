@@ -1,4 +1,4 @@
-ID,Biowaste Supply ,Prunning Supply,Reissued Supply,Sawdust Supply,Leaves Supply,Ampient Temperature,Mean Temparature,Max Temperature,Duration,Compost Crude,Compost Net
+ID,Biowaste Feed ,Prunning Feed,Recycled Compost Feed,Sawdust Feed,Leaf Feed,Ambient Temperature,Mean Temparature,Max Temperature,Duration,Compost Crude,Compost Net
 1,328,164,"0,0","0,0","0,0","10,8",50,75,105,183,97
 2,328,164,"0,0","0,0","0,0","10,8",42,65,90,183,97
 3,268,134,"0,0","0,0","0,0","13,4",43,63,82,"151,5",56
