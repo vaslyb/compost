@@ -15,32 +15,32 @@ import numpy as np
 # Load CSV file using Pandas
 df = pd.read_csv('compost.csv') 
 
-df = df.replace(',', '.', regex=True)  # Replace commas with dots (assuming ',' represents decimal separator)
+df = df.replace(',', '.', regex=True)  
 
 # Extract features and target from the DataFrame
-features = df.iloc[:, 1:7].values  
-target = df.iloc[:, -5:].values  
-
-# Standardize the features
-scaler = StandardScaler()
-features_standardized = scaler.fit_transform(features)
-
-target = target.astype(float)
-target_standardized = scaler.fit_transform(target)
-
-# Select specific rows from the array with indices 1, 2, 3
+features = df.iloc[:, [7,8,9,10,11]].values  
+target = df.iloc[:, [13,14,17,18] ].values 
+#[8,9,10,11,12]
+#[13,14,17,18] 
+#[12,13,14,15,16] 
 selected_indices = [5, 10, 15, 20, 25 , 30, 35, 40]
-
 # Create a boolean mask for the selected indices
-mask = np.zeros(features_standardized.shape[0], dtype=bool)
+mask = np.zeros(features.shape[0], dtype=bool)
 mask[selected_indices] = True
 
 # Use boolean indexing to get the selected and remaining rows
-x_train = features_standardized[mask]
-y_train = target_standardized[mask]
+x_train = features[mask]
+x_test = features[~mask]
+scaler = StandardScaler()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
 
-x_test = features_standardized[~mask]
-y_test = target_standardized[~mask]
+target = target.astype(float)
+y_train = target[mask]
+y_test = target[~mask]
+scaler = StandardScaler()
+y_train = scaler.fit_transform(y_train)
+y_test = scaler.transform(y_test)
 
 # Define a list of regression models
 models = [
@@ -63,9 +63,9 @@ for model in models:
         # Visualize a limited-depth decision tree
         max_depth = 3  # Set the maximum depth you want to visualize
         plt.figure(figsize=(18, 12))
-        plot_tree(model, filled=True, feature_names=df.columns[1:7], class_names=df.columns[-5:], fontsize=10, max_depth=max_depth)
+        plot_tree(model, filled=True, feature_names=df.columns[[7,8,9,10,11]], class_names=df.columns[[13,14,17,18] ], fontsize=10, max_depth=max_depth)
         plt.title(f'{model_name} Decision Tree (Max Depth = {max_depth})')
-        image_file_path = f'{model_name}_decision_tree.png'
+        image_file_path = f'./results/{model_name}_decision_tree.png'
         plt.savefig(image_file_path)
         print(f'Decision tree visualization saved to {image_file_path}')
 
@@ -81,7 +81,17 @@ for model in models:
     test_mse = mean_squared_error(y_test, test_predictions)
     test_mae = mean_absolute_error(y_test, test_predictions)
     test_r2 = r2_score(y_test, test_predictions)
-    
+
+    # Save predictions and ground truth to a CSV file
+    predictions_df = pd.DataFrame({
+        'Ground Truth': y_test.flatten(),
+        'Predictions': test_predictions.flatten()
+    })
+
+    predictions_df.to_csv(f'./results/{model_name}_predictions.csv', index=False)
+    print(f'Test predictions saved to {model_name}_predictions.csv')
+    if hasattr(model, 'intercept_'):
+        print(model.intercept_)
     # Store results in the dictionary
     results[model_name] = {
         'train_mse': train_mse,
@@ -90,7 +100,8 @@ for model in models:
         'test_mae': test_mae,
         'train_r2': train_r2,
         'test_r2': test_r2,
-        'coefficients': list(model.coef_) if hasattr(model, 'coef_') else None
+        'coefficients': list(model.coef_) if hasattr(model, 'coef_') else None,
+        'predictions_file': f'{model_name}_predictions.csv'
     }
 
 # Print and save results to a JSON file
@@ -101,7 +112,7 @@ for model_name, result in results.items():
     print(f"{model_name}: Train R2 = {result['train_r2']}, Test R2 = {result['test_r2']}")
 
 # Save results to a JSON file
-with open('compost_results.json', 'w') as json_file:
+with open('./results/compost_results.json', 'w') as json_file:
     json.dump(results, json_file, indent=4, default=lambda x: x.tolist())
 
 print("Results saved to 'compost_results.json'")
@@ -112,19 +123,19 @@ for model_name, result in results.items():
     if coefficients is not None:
         fig = go.Figure(data=go.Heatmap(
             z=coefficients,
-            x=df.columns[1:7],
-            y=df.columns[-5:],
+            x=df.columns[[7,8,9,10,11]],
+            y=df.columns[[13,14,17,18] ],
             colorscale='YlOrRd',
             colorbar=dict(title='Coefficients')
         ))
 
         # Add annotations with coefficient values
-        for i in range(len(df.columns[-5:])):
-            for j in range(len(df.columns[1:7])):
+        for i in range(len(df.columns[[13,14,17,18] ])):
+            for j in range(len(df.columns[[7,8,9,10,11]])):
                 coefficient_value = float(coefficients[i][j])
                 fig.add_annotation(
-                    x=df.columns[1:7][j],
-                    y=df.columns[-5:][i],
+                    x=df.columns[[7,8,9,10,11]][j],
+                    y=df.columns[[13,14,17,18]][i],
                     text=f'{coefficient_value:.2f}',
                     showarrow=False,
                     font=dict(color='black', size=10)
@@ -133,5 +144,5 @@ for model_name, result in results.items():
         fig.update_layout(title=f'{model_name} Coefficients Heatmap', xaxis_title='Features', yaxis_title='Target Variables')
 
         # Save the figure as an image file (e.g., PNG)
-        fig.write_image(f'{model_name}_heatmap.png')
+        fig.write_image(f'./results/{model_name}_heatmap.png')
 
