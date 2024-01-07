@@ -1,0 +1,59 @@
+{
+    "LinearRegression": {
+        "train_mse": 44.16430635638246,
+        "test_mse": 42.13219339452555,
+        "train_mae": 5.123493962578169,
+        "test_mae": 4.8312077229014285,
+        "train_r2": 0.3801331886291358,
+        "test_r2": 0.5897639647389243,
+        "coefficients": [
+            [
+                1.4102117253438997
+            ],
+            [
+                1.2256625795400018
+            ]
+        ],
+        "predictions_file": "LinearRegression_predictions.csv"
+    },
+    "KNeighborsRegressor": {
+        "train_mse": 30.90213333333334,
+        "test_mse": 37.722800000000014,
+        "train_mae": 4.685555555555555,
+        "test_mae": 5.040000000000001,
+        "train_r2": 0.5680344817340616,
+        "test_r2": 0.6291132487352764,
+        "coefficients": null,
+        "predictions_file": "KNeighborsRegressor_predictions.csv"
+    },
+    "DecisionTreeRegressor": {
+        "train_mse": 11.947314814814813,
+        "test_mse": 74.60416666666667,
+        "train_mae": 2.3527777777777783,
+        "test_mae": 6.5625,
+        "train_r2": 0.8338976447139905,
+        "test_r2": 0.14416871153139033,
+        "coefficients": null,
+        "predictions_file": "DecisionTreeRegressor_predictions.csv"
+    },
+    "MultiOutputRegressor": {
+        "train_mse": 92.57590840617357,
+        "test_mse": 34.14476829131779,
+        "train_mae": 7.1936514681215336,
+        "test_mae": 4.919647496213454,
+        "train_r2": -0.308113661320501,
+        "test_r2": 0.639254560490885,
+        "coefficients": null,
+        "predictions_file": "MultiOutputRegressor_predictions.csv"
+    },
+    "XGBRegressor": {
+        "train_mse": 11.947315558345057,
+        "test_mse": 74.5895741902259,
+        "train_mae": 2.353010039859348,
+        "test_mae": 6.56167459487915,
+        "train_r2": 0.8338976342781775,
+        "test_r2": 0.1443480845940402,
+        "coefficients": null,
+        "predictions_file": "XGBRegressor_predictions.csv"
+    }
+}

@@ -1,0 +1,3 @@
+y = 1.41x + 23.028 ambient - mean
+y = 1.225x + 48.811 ambient - max
+
