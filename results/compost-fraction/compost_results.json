@@ -1,0 +1,81 @@
+{
+    "LinearRegression": {
+        "train_mse": 240.73249023054723,
+        "test_mse": 452.7179123850923,
+        "train_mae": 10.476023855053647,
+        "test_mae": 14.73593058570212,
+        "train_r2": 0.48171510203472456,
+        "test_r2": -0.13366110616249965,
+        "coefficients": [
+            [
+                -2.8363083455360174,
+                0.45504955488625143,
+                2.8641754207795853,
+                7.0532867632822125,
+                4.33618065582747
+            ],
+            [
+                1.5094471585072928,
+                -2.136376637480679,
+                0.27189629596234566,
+                3.5907329090022717,
+                2.42530037385991
+            ],
+            [
+                20.63287966148166,
+                -2.949640655397767,
+                6.451291173994166,
+                -11.470772386141919,
+                -3.1445104751392385
+            ],
+            [
+                8.040101983347961,
+                0.6175631478204289,
+                7.111033631915812,
+                -4.161844360845777,
+                1.7278428789426012
+            ]
+        ],
+        "predictions_file": "LinearRegression_predictions.csv"
+    },
+    "KNeighborsRegressor": {
+        "train_mse": 214.03028055555555,
+        "test_mse": 236.6740625,
+        "train_mae": 10.272361111111111,
+        "test_mae": 10.483125,
+        "train_r2": 0.5110902456451207,
+        "test_r2": 0.2726349268458115,
+        "coefficients": null,
+        "predictions_file": "KNeighborsRegressor_predictions.csv"
+    },
+    "DecisionTreeRegressor": {
+        "train_mse": 0.6145833333333333,
+        "test_mse": 415.6300000000001,
+        "train_mae": 0.1736111111111111,
+        "test_mae": 12.568750000000001,
+        "train_r2": 0.9913486645322511,
+        "test_r2": -0.06421518449997485,
+        "coefficients": null,
+        "predictions_file": "DecisionTreeRegressor_predictions.csv"
+    },
+    "MultiOutputRegressor": {
+        "train_mse": 5511.1183214638495,
+        "test_mse": 5718.438543334668,
+        "train_mae": 55.74822522097682,
+        "test_mae": 58.321294072972194,
+        "train_r2": -10.192545467669724,
+        "test_r2": -15.653206588493319,
+        "coefficients": null,
+        "predictions_file": "MultiOutputRegressor_predictions.csv"
+    },
+    "XGBRegressor": {
+        "train_mse": 0.6145841044029091,
+        "test_mse": 374.30504484973756,
+        "train_mae": 0.17421423594156904,
+        "test_mae": 12.846298480033875,
+        "train_r2": 0.9913486583466746,
+        "test_r2": -0.011261958535679184,
+        "coefficients": null,
+        "predictions_file": "XGBRegressor_predictions.csv"
+    }
+}

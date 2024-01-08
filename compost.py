@@ -29,8 +29,12 @@ df = df.replace(',', '.', regex=True)
 # output = [12,13]
 
 # percentage of feed
-input = [7,8,9,10]
-output = [11,12,17,18]
+# input = [7,8,9,10]
+# output = [12,13,17,18]
+
+# consistancy - feed
+input = [2,3,4,5,6]
+output = [12,13,15,16]
 
 features = df.iloc[:, input].values  
 target = df.iloc[:, output].values
@@ -80,7 +84,7 @@ for model in models:
     # Visualize the tree for Decision Tree
     if isinstance(model, DecisionTreeRegressor):
         # Visualize a limited-depth decision tree
-        max_depth = 3  # Set the maximum depth you want to visualize
+        max_depth = 7  # Set the maximum depth you want to visualize
         
         # Create a DOT format string for the decision tree
         dot_data = export_graphviz(model, filled=True, feature_names=df.columns[input],
@@ -108,24 +112,25 @@ for model in models:
     test_mae = mean_absolute_error(y_test, test_predictions)
     test_r2 = r2_score(y_test, test_predictions)
 
+    scaler = StandardScaler()
+    features = scaler.fit_transform(features)
     all_predictions = model.predict(features)
     
     if isinstance(model, XGBRegressor) and flag==True:
         # Visualize the results
-        grid_size = (len(y_test[0]), 1)
+        grid_size = (2, 2)
 
         fig, axes = plt.subplots(*grid_size, figsize=(15, 15))
 
         axes = axes.flatten()
-
         for i, ax in enumerate(axes[:len(y_test[0])]):
-            x_axis = [j for j in range(1, len(y_test) + 1)]  # Update x_axis for each subplot
+            x_axis = [j for j in range(1, len(target) + 1)]  # Update x_axis for each subplot
 
             # Scatter plot for actual values
-            ax.scatter(x_axis, y_test[:, i], color='black', label='Actual')
+            ax.scatter(x_axis, target[:, i], color='black', label='Actual')
 
             # Scatter plot for predicted values
-            ax.scatter(x_axis, test_predictions[:, i], color='red', label='Predicted')
+            ax.scatter(x_axis, all_predictions[:, i], color='red', label='Predicted')
             ax.set_xlabel('Run')
             ax.set_ylabel(target_labels[i])
             ax.legend()
