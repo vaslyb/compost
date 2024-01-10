@@ -12,6 +12,7 @@ import numpy as np
 import subprocess
 import matplotlib.pyplot as plt
 from xgboost import XGBRegressor
+import xgboost as xgb
 
 # Load CSV file using Pandas
 df = pd.read_csv('compost.csv') 
@@ -32,9 +33,13 @@ df = df.replace(',', '.', regex=True)
 # input = [7,8,9,10]
 # output = [12,13,17,18]
 
-# consistancy - feed
-input = [2,3,4,5,6]
-output = [12,13,15,16]
+# all consistancy - feed
+# input = [2,3,4,5,6,11]
+# output = [12,13,14,15,16]
+
+# all consistancy - feed
+input = [2,3,4,5,6,11]
+output = [12,13,14,15,16]
 
 features = df.iloc[:, input].values  
 target = df.iloc[:, output].values
@@ -81,10 +86,27 @@ for model in models:
     # Train the model
     model.fit(x_train, y_train)
     
+    if isinstance(model, XGBRegressor):
+        # Visualize feature importance for XGBoost
+        fig, ax = plt.subplots(figsize=(10, 8))
+        xgb.plot_importance(model, ax=ax, importance_type='weight', show_values=False)
+        ax.set_yticklabels(['Biowaste Feed', 'Pruning Feed', 'Recycled Compost Feed', 'Sawdust Feed', 'Leaf Feed', 'Ambient Temperature'])
+        plt.title('XGBoost Feature Importance')
+        plt.tight_layout()
+        plt.savefig('./results/XGBoost_feature_importance.png')
+
+        # # Visualize individual trees in the XGBoost model
+        # for tree_index in range(model.n_estimators):
+        #     plt.figure(figsize=(10, 8))
+        #     xgb.plot_tree(model, num_trees=tree_index, rankdir='LR', feature_names=['Biowaste Feed', 'Pruning Feed', 'Recycled Compost Feed', 'Sawdust Feed', 'Leaf Feed', 'Ambient Temperature'])
+        #     plt.title(f'XGBoost Tree {tree_index + 1}')
+        #     plt.savefig(f'./results/XGBoost_tree_{tree_index + 1}.png')
+        #     plt.show()
+    
     # Visualize the tree for Decision Tree
     if isinstance(model, DecisionTreeRegressor):
         # Visualize a limited-depth decision tree
-        max_depth = 7  # Set the maximum depth you want to visualize
+        max_depth = 4  # Set the maximum depth you want to visualize
         
         # Create a DOT format string for the decision tree
         dot_data = export_graphviz(model, filled=True, feature_names=df.columns[input],
@@ -116,9 +138,9 @@ for model in models:
     features = scaler.fit_transform(features)
     all_predictions = model.predict(features)
     
-    if isinstance(model, XGBRegressor) and flag==True:
+    if isinstance(model, KNeighborsRegressor) and flag==True:
         # Visualize the results
-        grid_size = (2, 2)
+        grid_size = (5, 1)
 
         fig, axes = plt.subplots(*grid_size, figsize=(15, 15))
 
@@ -136,7 +158,7 @@ for model in models:
             ax.legend()
             ax.tick_params(axis='x', rotation=45)
 
-        plt.suptitle('XGBoost Regression')
+        plt.suptitle('K-Neighbors Regressor')
         # Adjust layout and save the figure
         plt.tight_layout(pad=3.0)
         plt.savefig('./results/svr_plot.png')
