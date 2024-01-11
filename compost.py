@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.neighbors import KNeighborsRegressor
@@ -7,19 +8,18 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.svm import LinearSVR
 from sklearn.preprocessing import StandardScaler
 import plotly.graph_objects as go
-import pandas as pd
 import numpy as np
 import subprocess
 import matplotlib.pyplot as plt
 from xgboost import XGBRegressor
+from sklearn.neural_network import MLPRegressor  # Import the MLPRegressor
 import xgboost as xgb
 
 # Load CSV file using Pandas
-df = pd.read_csv('compost.csv') 
-df = df.replace(',', '.', regex=True)  
+df = pd.read_csv('compost.csv')
+df = df.replace(',', '.', regex=True)
 
 # Select input and output of the models
-# 3 different experiments
 
 # feed-duration
 # input = [1]
@@ -34,12 +34,11 @@ df = df.replace(',', '.', regex=True)
 # output = [12,13,17,18]
 
 # all consistancy - feed
-# input = [2,3,4,5,6,11]
-# output = [12,13,14,15,16]
-
-# all consistancy - feed
 input = [2,3,4,5,6,11]
 output = [12,13,14,15,16]
+
+input_feature_names = df.columns[input]
+output_feature_names = df.columns[output]
 
 features = df.iloc[:, input].values  
 target = df.iloc[:, output].values
@@ -57,12 +56,11 @@ target = target.astype(float)
 y_train = target[~mask]
 y_test = target[mask]
 
-# Standarise the input data
 scaler = StandardScaler()
 x_train = scaler.fit_transform(x_train)
+x_test_temp = x_test
 x_test = scaler.transform(x_test)
 
-# Standarise the output data
 # scaler = StandardScaler()
 # y_train = scaler.fit_transform(y_train)
 # y_test = scaler.transform(y_test)
@@ -76,9 +74,11 @@ models = [
     XGBRegressor()
 ]
 
-flag = True
+model_names = ['Linear Regression', 'K-Neighbors Regressor', 'Decision Tree Regressor', 'Support Vector Regressor', 'XGBoost Regressor']
 
 results = {}
+
+predictions_df = pd.DataFrame()
 
 for model in models:
     model_name = type(model).__name__
@@ -94,14 +94,6 @@ for model in models:
         plt.title('XGBoost Feature Importance')
         plt.tight_layout()
         plt.savefig('./results/XGBoost_feature_importance.png')
-
-        # # Visualize individual trees in the XGBoost model
-        # for tree_index in range(model.n_estimators):
-        #     plt.figure(figsize=(10, 8))
-        #     xgb.plot_tree(model, num_trees=tree_index, rankdir='LR', feature_names=['Biowaste Feed', 'Pruning Feed', 'Recycled Compost Feed', 'Sawdust Feed', 'Leaf Feed', 'Ambient Temperature'])
-        #     plt.title(f'XGBoost Tree {tree_index + 1}')
-        #     plt.savefig(f'./results/XGBoost_tree_{tree_index + 1}.png')
-        #     plt.show()
     
     # Visualize the tree for Decision Tree
     if isinstance(model, DecisionTreeRegressor):
@@ -138,7 +130,7 @@ for model in models:
     features = scaler.fit_transform(features)
     all_predictions = model.predict(features)
     
-    if isinstance(model, KNeighborsRegressor) and flag==True:
+    if isinstance(model, KNeighborsRegressor):
         # Visualize the results
         grid_size = (5, 1)
 
@@ -163,14 +155,37 @@ for model in models:
         plt.tight_layout(pad=3.0)
         plt.savefig('./results/svr_plot.png')
 
-    # Save predictions and ground truth to a CSV file
-    predictions_df = pd.DataFrame({
-        'Ground Truth': y_test.flatten(),
-        'Predictions': test_predictions.flatten()
-    })
+   # Create columns for each output feature in the current model's predictions and ground truth
+    for i, output_feature_name in enumerate(output_feature_names):
+        ground_truth_col = f'Ground Truth_{model_name}_{output_feature_name}'
+        predictions_col = f'Predictions_{model_name}_{output_feature_name}'
 
-    predictions_df.to_csv(f'./results/{model_name}_predictions.csv', index=False)
-    print(f'Test predictions saved to {model_name}_predictions.csv')
+        # Extract the ith output feature for the current model
+        ground_truth_values = y_test[:, i]
+        predictions_values = test_predictions[:, i]
+
+        # Create a DataFrame for the current output feature
+        output_feature_predictions_df = pd.DataFrame({
+            ground_truth_col: ground_truth_values,
+            predictions_col: predictions_values,
+        })
+
+        # Concatenate the current output feature's DataFrame to the overall DataFrame
+        predictions_df = pd.concat([predictions_df, output_feature_predictions_df], axis=1)
+
+    # Create columns for each input feature in the current model's input data
+    for j, input_feature_name in enumerate(input_feature_names):
+        input_feature_col = f'Input_{input_feature_name}'
+        input_feature_values = x_test_temp[:, j]
+
+        # Create a DataFrame for the current input feature
+        input_feature_df = pd.DataFrame({
+            input_feature_col: input_feature_values,
+        })
+
+        # Concatenate the current input feature's DataFrame to the overall DataFrame
+        predictions_df = pd.concat([predictions_df, input_feature_df], axis=1)
+
     if hasattr(model, 'intercept_'):
         print("Linear's Coefficients",model.coef_,model.intercept_)
     # Store results in the dictionary
@@ -184,13 +199,13 @@ for model in models:
         'coefficients': list(model.coef_) if hasattr(model, 'coef_') else None,
         'predictions_file': f'{model_name}_predictions.csv'
     }
-
+predictions_df.to_csv('./results/all_models_predictions.csv', index=False)
 # Print and save results to a JSON file
 print("Results:")
 for model_name, result in results.items():
-    print(f"{model_name}: Train MSE = {result['train_mse']}, Test MSE = {result['test_mse']}")
-    print(f"{model_name}: Train MAE = {result['train_mae']}, Test MAE = {result['test_mae']}")
-    print(f"{model_name}: Train R2 = {result['train_r2']}, Test R2 = {result['test_r2']}")
+    print(f"{model_name}: Test MSE = {result['test_mse']:.3f}")
+    print(f"{model_name}: Test MAE = {result['test_mae']:.3f}")
+    print(f"{model_name}: Test R2 = {result['test_r2']:.3f}")
 
 # Save results to a JSON file
 with open('./results/compost_results.json', 'w') as json_file:
@@ -198,7 +213,62 @@ with open('./results/compost_results.json', 'w') as json_file:
 
 print("Results saved to 'compost_results.json'")
 print()
-# Plot coefficients using Plotly
+
+# Create a table for test set metrics
+metrics_table_data = []
+for model_name, result in zip(model_names, results.values()):
+    metrics_table_data.append([
+        model_name,
+        result['test_mse'],
+        result['test_mae'],
+        result['test_r2']
+    ])
+
+# Convert the data to a DataFrame
+metrics_table_df = pd.DataFrame(metrics_table_data, columns=[
+    'Model', 'MSE', 'MAE', 'R2'
+])
+
+# Order models based on Test R2
+metrics_table_df = metrics_table_df.sort_values(by='R2', ascending=True)
+
+# Identify the model with the highest Test R2
+best_model_name = metrics_table_df.iloc[-1]['Model']
+
+# Plot the metrics table as an image with enhanced formatting
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.axis('off')
+table = ax.table(cellText=metrics_table_df.round(3).values,
+                 colLabels=metrics_table_df.columns,
+                 cellLoc='center',
+                 loc='center',
+                 bbox=[0, 0, 1, 1],  # Specify the table location and size
+                 cellColours=[['#f0f0f0'] * len(metrics_table_df.columns)] * len(metrics_table_df),
+                 colColours=['#ffffff'] * len(metrics_table_df.columns))
+table.auto_set_font_size(False)
+table.set_fontsize(17)
+table.auto_set_column_width([0, 1, 2, 3])  # Adjust column width for better readability
+
+table.auto_set_font_size(False)
+table.set_fontsize(17)
+table.auto_set_column_width([0, 1, 2, 3])
+table.auto_set_column_width(1)
+
+# Bold the row corresponding to the best model
+best_model_index = metrics_table_df.index[metrics_table_df['Model'] == best_model_name][0] + 1
+for coord, cell in table._cells.items():
+    row, col = coord
+    cell_obj = table._cells[row, col]
+    if row == len(metrics_table_df):
+        cell_obj.set_text_props(fontweight='bold')
+
+
+plt.title('Metrics Table', fontsize=14, fontweight='bold')
+
+plt.tight_layout()
+plt.savefig('./results/metrics_table.png')
+
+
 for model_name, result in results.items():
     coefficients = result['coefficients']
     if coefficients is not None:
