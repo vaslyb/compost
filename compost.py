@@ -13,7 +13,13 @@ import subprocess
 import matplotlib.pyplot as plt
 from xgboost import XGBRegressor
 import xgboost as xgb
+import os
 
+# Create a results directory if it does not exist
+results_directory = './results'
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
+    
 # Load CSV file using Pandas
 df = pd.read_csv('compost.csv')
 df = df.replace(',', '.', regex=True)
@@ -68,7 +74,7 @@ x_test = scaler.transform(x_test)
 models = [
     LinearRegression(),
     KNeighborsRegressor(),
-    DecisionTreeRegressor(),
+    DecisionTreeRegressor(random_state=41),
     MultiOutputRegressor(LinearSVR()),
     XGBRegressor()
 ]
