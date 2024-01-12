@@ -24,23 +24,8 @@ if not os.path.exists(results_directory):
 df = pd.read_csv('compost.csv')
 df = df.replace(',', '.', regex=True)
 
-# Select experiment
-input_features = {
-    'feed-duration': [1],
-    'temperatures': [11],
-    'percentage_of_feed': [7, 8, 9, 10],
-    'all_consistency_feed': [2, 3, 4, 5, 6, 11]
-}
-
-output_features = {
-    'feed-duration': [14],
-    'temperatures': [12, 13],
-    'percentage_of_feed': [12, 13, 17, 18],
-    'all_consistency_feed': [12, 13, 14, 15, 16]
-}
-
-input = input_features['all_consistency_feed']
-output = output_features['all_consistency_feed']
+input = [1,2,3,4,5,6]
+output = [7,8,9,10,11]
 
 input_feature_names = df.columns[input]
 output_feature_names = df.columns[output]
