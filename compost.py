@@ -100,7 +100,6 @@ for model in models:
         png_file_path = f'./results/{model_name}_decision_tree.png'
         subprocess.run(['dot', '-Tpng', dot_file_path, '-o', png_file_path], check=True)
    
-        print(f'Decision tree visualization saved to {png_file_path}')
     
     # Visualize part of the tree for Decision Tree     
     if isinstance(model, DecisionTreeRegressor):
@@ -115,9 +114,7 @@ for model in models:
         
         png_file_path = f'./results/{model_name}_decision_tree_part.png'
         subprocess.run(['dot', '-Tpng', dot_file_path, '-o', png_file_path], check=True)
-   
-        print(f'Decision tree visualization saved to {png_file_path}')
-        
+           
     # Make predictions on the training set and calculate metrics
     train_predictions = model.predict(x_train)
     train_mse = mean_squared_error(y_train, train_predictions)
