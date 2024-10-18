@@ -1,8 +1,11 @@
 ## Reproduction of Machine Learning Experiments
 
 This section contains the code used to reproduce the machine learning models from the article:  
-**Lytras, C., Lyberatos, V., Lytras, G., Papadopoulou, K., Vlysidis, A., & Lyberatos**  
-*Development of a model composting process for food waste in an island community and use of machine learning models to predict its performance.*
+
+**Development of a model composting process for food waste in an island community and use of machine learning models to predict its performance.**
+
+*Lytras, C., Lyberatos, V., Lytras, G., Papadopoulou, K., Vlysidis, A., & Lyberatos*
+
 
 ### Available in
 
